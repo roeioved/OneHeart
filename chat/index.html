@@ -1,0 +1,24 @@
+<html>
+
+<head>
+    <title>Chat Demo</title>
+	<link type="text/css" rel="stylesheet" href="style.css" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $('form').bind('submit', function() {
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <form id="welcome" action="chat.html" method="get" target="_blank">
+        <input id="user" name="user" class="textbox" type="text" placeholder="Enter nickname"/>
+        <input id="room" name="room" class="textbox" type="text" placeholder="Enter room"/>
+        <input id="submit" class="submit" type="submit" value="Chat!" />
+    </form>    
+</body>
+
+</html>

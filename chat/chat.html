@@ -1,0 +1,83 @@
+<html>
+
+<head>
+    <title>Chat Demo</title>    
+	<link type="text/css" rel="stylesheet" href="style.css" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    <script type="text/javascript" src="socket.io.js"></script>
+    
+    <script>
+        function getQueryString(key, default_) {
+            if (default_==null) default_=""; 
+            key = key.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+            var regex = new RegExp("[\\?&]"+key+"=([^&#]*)");
+            var qs = regex.exec(window.location.href);
+            if(qs == null)
+                return default_;
+            else
+                return qs[1];
+        }
+        var room = getQueryString('room');
+        var user = getQueryString('user');
+
+        var socket = io.connect('http://localhost:8000');
+    
+        socket.on('connect', function() {
+            socket.emit('join', room, user);
+        });
+                        
+        socket.on('join', function(user, numOfUsers) {
+            $("#numOfUsers").html(numOfUsers);
+            addMessage(user + ' joined', null, 'join');
+        });
+
+        socket.on('disconnect', function(user, numOfUsers) {
+            $("#numOfUsers").html(numOfUsers);
+            addMessage(user + ' disconnected', null, 'disconnect');
+        });
+
+        socket.on('message', function(user, message) {
+            addMessage(message, user);
+        });
+
+        $(document).ready(function() {
+            $("#room").html(room);
+            $("#user").html(user);
+            
+            $("#message").keypress( function(event) {
+                if (event.which == '13') {
+                    sendMessage();
+                    event.preventDefault();
+                }
+            });
+        });
+        
+        function addMessage(message, from, style) {
+            var log = ''; 
+            
+            if (from)
+                log = from + ' : ';
+            
+            log = '<span class="' + style + '">' + log + message + '</span>' + '<br>';
+            
+            $("#chatlog").prepend(log);
+        }
+        
+        function sendMessage() {
+            var message = $("#message").val();
+            socket.emit('message', user, message);
+            addMessage(message, user);
+            $("#message").val('');
+        }    
+    </script>
+</head>
+
+<body>
+    <div id="header">
+        <input id="message" class="textbox" type="text" placeholder="Type your message..."/>
+        <span id="user"></span>@<span id="room"></span>&nbsp&nbsp<span id="numOfUsers"></span> online users
+    </div>    
+    <div id="chatlog"></div>
+</body>
+
+</html>

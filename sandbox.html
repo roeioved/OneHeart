@@ -1,0 +1,33 @@
+<html>
+
+<head>
+    <title>One Heart</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    <script type="text/javascript" src="socket.io.js"></script>
+    
+    <script>
+        var socket = io.connect('http://localhost:8000');
+        var heart = 'sandbox';
+
+        socket.on('connect', function() {
+            socket.emit('join', heart);
+        });
+                        
+        socket.on('stats', function(numOfUsers) {
+            $("#num_of_users").html(numOfUsers);
+        });
+
+        $(document).ready(function() {
+            $("#tap").click(function() {
+                socket.emit('tap', 1000, 3);
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="tap">tap!</div>
+    <div id="num_of_users"></div>
+</body>
+
+</html>
