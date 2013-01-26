@@ -19,7 +19,10 @@ function calculateHeartBeatAverageForInterval(heartToCalculate, intervalSeconds)
         if (numberOfHeartUsers > 0)
         {
             // Get the all the taps in the last interval
-            tap.findByHeartAndTime(heartToCalculate,ms,function(itemsFounds){calculateAverageForTaps(heartInfo,itemsFounds,numberOfHeartUsers)});
+            tap.findByHeartAndTime(heartToCalculate,ms,function(itemsFounds)
+            {
+                calculateAverageForTaps(heartInfo,itemsFounds,numberOfHeartUsers)
+            });
         }
         else
         {
@@ -40,6 +43,20 @@ function calculateAverageForTaps(heartInfo,heartTaps, numberOfUsers)
 
     // Calculate the average
     var average = sumOfTaps / numberOfUsers;
+    var pointsToAdd = 0;
+
+    // Go over all the hearts to update point system
+    heartTaps.forEach(function(currHeartTap)
+    {
+        var currTapAvg = currHeartTap.taps / ((currHeartTap.to - currHeartTap.from) / 1000);
+        var distance = Math.abs(currTapAvg - average);
+
+        if (distance >= 0 && distance <= 3)
+        {
+//            pointsToAdd
+        }
+
+    });
 
     if (heartInfo.average_taps != average)
     {
