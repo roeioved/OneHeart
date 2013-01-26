@@ -1,5 +1,5 @@
 var db = require('./connectdb').db;
-var heart = require('./heart');
+var heart = require('./heart').setDb(db);
 
 var express = require('express');
 var app = express();
@@ -9,10 +9,10 @@ app.configure(function () {
     app.use(express.bodyParser());
 });
 
-app.get('/hearts', heart.getHearts);
-app.get('/hearts/:id', heart.getHeartById);
-app.post('/hearts', heart.addHeart);
-app.put('/hearts/:id', heart.updateHeart);
-app.delete('/hearts/:id', heart.deleteHeart);
+app.get('/hearts', heart.findAll);
+app.get('/hearts/:id', heart.findById);
+app.post('/hearts', heart.add);
+app.put('/hearts/:id', heart.update);
+app.delete('/hearts/:id', heart.delete);
 
 app.listen(8001);

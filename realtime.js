@@ -1,4 +1,5 @@
 var db = require('./connectdb').db;
+var tap = require('./taps').setDb(db);
 
 var io = require('socket.io').listen(8000);
 
@@ -42,7 +43,8 @@ io.sockets.on('connection', function(socket) {
 
     socket.on('tap', function(ms, taps) {
         socket.get('heart', function(err, heart) {
-            console.log('user tapped ' + taps + ' times in the last ' + ms + 'ms');
+            console.log('user tapped on ' + heart + ' ' + taps + ' times in the last ' + ms + 'ms');
+            tap.add(heart, ms, taps);
         });
     });
 });
