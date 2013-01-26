@@ -65,12 +65,22 @@ io.sockets.on('connection', function(socket) {
     });
 });
 
+function calcBPM(points) {
+    if (points == 0) {
+        return 0;
+    } else if (points > 10000) {
+        return Math.floor((Math.random()*95)+85);
+    } else {
+        return Math.floor((Math.random()*60)+20);
+    }
+}
+
 function getHeartStats(heart, callback) {
     heartManager.findById(heart, function(item) {
-        var bpm = 0;
         var numOfUsers = item.num_of_users ? item.num_of_users : 0;
         var averageTaps = item.average_taps ? item.average_taps : 0;
         var points = item.points ? item.points : 0;
+        var bpm = calcBPM(points);
 
         var stats = {bpm:bpm, numOfUsers:numOfUsers, averageTaps:averageTaps, points:points};
         callback(stats);

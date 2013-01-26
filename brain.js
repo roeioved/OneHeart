@@ -6,81 +6,80 @@ var Fiber = require('fibers');
 
 var heartFibers = new Array();
 
-function calculateHeartBeatAverageForInterval(heartToCalculate, intervalSeconds)
-{
+function calculateHeartBeatAverageForInterval(heartToCalculate, intervalSeconds) {
     // Convert the number of seconds to milliseconds
     var ms = intervalSeconds * 1000;
 
     // Get the updated count of users in the current heart
-    heart.findById(heartToCalculate, function (heartInfo)
-    {
+    heart.findById(heartToCalculate, function (heartInfo) {
         var numberOfHeartUsers = heartInfo.num_of_users;
 
-        if (numberOfHeartUsers > 0)
-        {
+        if (numberOfHeartUsers > 0) {
             // Get the all the taps in the last interval
-            tap.findByHeartAndTime(heartToCalculate,ms,function(itemsFounds)
-            {
+            tap.findByHeartAndTime(heartToCalculate,ms,function(itemsFounds) {
                 calculateAverageForTaps(heartInfo,itemsFounds,numberOfHeartUsers)
             });
-        }
-        else
-        {
+        } else {
             console.log("No heart users on heart:" + heartToCalculate);
         }
     });
 };
 
-function calculateAverageForTaps(heartInfo,heartTaps, numberOfUsers)
+function calculateAverageForTaps(heartInfo, heartTaps, numberOfUsers)
 {
     var sumOfTaps = 0;
+    var points = heartInfo.points;
 
     // Go over all the hearts
-    heartTaps.forEach(function(currHeartTap)
-    {
+    heartTaps.forEach(function(currHeartTap) {
         sumOfTaps += currHeartTap.taps / ((currHeartTap.to - currHeartTap.from) / 1000);
     });
 
     // Calculate the average
     var average = sumOfTaps / numberOfUsers;
-    var pointsToAdd = 0;
 
     // Go over all the hearts to update point system
-    heartTaps.forEach(function(currHeartTap)
-    {
+    heartTaps.forEach(function(currHeartTap) {
         var currTapAvg = currHeartTap.taps / ((currHeartTap.to - currHeartTap.from) / 1000);
         var distance = Math.abs(currTapAvg - average);
 
-        if (distance >= 0 && distance <= 3)
-        {
-//            pointsToAdd
+        if (distance <= 1) {
+            points += 100;
+        } else if (distance <= 3) {
+            points += 50;
+        } else if (distance <= 6) {
+            points += 40;
+        } else if (distance <= 9) {
+            points += 30;
+        } else if (distance <= 12) {
+            points += 20;
+        } else {
+            points += 10;
         }
-
     });
 
-    if (heartInfo.average_taps != average)
-    {
-        // Insert the average into the heart Data
-        heart.updateAverageTaps(heartInfo._id,average,function(){console.log("Updated DB")});
-    }
+    // Reduce points according to number of participating users
+    points -= (heartTaps.length == 0 ? 10 : heartTaps.length * 35);
+
+    if (points < 0) points = 0;
+    
+    heart.updateAverageTapsAndPoints(heartInfo._id, average, points, function() {
+        console.log("DB updated")
+    });
 }
 
-function startWorkerForHeart(heartToWork)
-{
+function startWorkerForHeart(heartToWork) {
     // Perform calculations for the current heart
     setInterval(function(){calculateHeartBeatAverageForInterval(heartToWork._id,CALCULATION_INTERVAL);},1000);
 }
 
-function startBrain()
-{
+function startBrain() {
     console.log("Starting brain")
 
     // Get all the hearts from the db
-    heart.findAll(function(allHearts)
-    {
+    heart.findAll(function(allHearts) {
         // Go over each heart start a fiber for it
-        allHearts.forEach(function(currHeart)
-        {
+        allHearts.forEach(function(currHeart) {
             // Create a fiber for the current heart
             var curHeartFiber = Fiber(function(){startWorkerForHeart(currHeart)});
 
@@ -93,4 +92,3 @@ function startBrain()
 // Main - start the server threads here
 console.log("Brain is Up");
 startBrain();
-

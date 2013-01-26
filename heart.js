@@ -64,9 +64,17 @@ exports.updateAverageTaps = function(id, averageTaps, callback) {
     });
 }
 
-exports.updatePoints = function(id, diff, callback) {
+exports.updatePoints = function(id, points, callback) {
     _db.collection(HEARTS_COLLECTION, function(err, collection) {
-        collection.update({'_id':id}, {$inc:{'points':diff}}, {upsert:true, safe:true}, function(err, result) {
+        collection.update({'_id':id}, {$set:{'points':points}}, {upsert:true, safe:true}, function(err, result) {
+            callback(err);
+        });
+    });
+}
+
+exports.updateAverageTapsAndPoints = function(id, averageTaps, points, callback) {
+    _db.collection(HEARTS_COLLECTION, function(err, collection) {
+        collection.update({'_id':id}, {$set:{'average_taps':averageTaps, 'points':points}}, {upsert:true, safe:true}, function(err, result) {
             callback(err);
         });
     });
