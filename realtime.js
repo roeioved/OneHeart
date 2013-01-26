@@ -56,10 +56,12 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('tap', function(ms, taps) {
-        socket.get('heart', function(err, heart) {
-            //console.log('user tapped on ' + heart + ' ' + taps + ' times in the last ' + ms + 'ms');
-            tapManager.add(heart, ms, taps);
-        });
+        if (taps > 0) {
+            socket.get('heart', function(err, heart) {
+                //console.log('user tapped on ' + heart + ' ' + taps + ' times in the last ' + ms + 'ms');
+                tapManager.add(heart, ms, taps);
+            });
+        }
     });
 });
 
@@ -68,14 +70,15 @@ function getHeartStats(heart, callback) {
         var bpm = 0;
         var numOfUsers = item.num_of_users ? item.num_of_users : 0;
         var averageTaps = item.average_taps ? item.average_taps : 0;
+        var points = item.points ? item.points : 0;
 
-        var stats = {bpm:bpm, numOfUsers:numOfUsers, averageTaps:averageTaps};
+        var stats = {bpm:bpm, numOfUsers:numOfUsers, averageTaps:averageTaps, points:points};
         callback(stats);
     });
 }
 
 function broadcastStats(heart) {
     getHeartStats(heart, function(stats) {
-        io.sockets.in(heart).emit('stats', stats.bpm, stats.numOfUsers, stats.averageTaps);
+        io.sockets.in(heart).emit('stats', stats.bpm, stats.numOfUsers, stats.averageTaps, stats.points);
     });
 }

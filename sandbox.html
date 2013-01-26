@@ -8,17 +8,18 @@
     <script type="text/javascript" src="socket.io.js"></script>
 
     <script>
-        var socket = io.connect('http://172.20.10.4:8000');
+        var socket = io.connect('http://localhost:8000');
         var heart = 'sandbox';
 
         socket.on('connect', function() {
             socket.emit('join', heart);
         });
 
-        socket.on('stats', function(bpm, numOfUsers, averageTaps) {
+        socket.on('stats', function(bpm, numOfUsers, averageTaps, points) {
             $("#bpm").html(bpm);
             $("#num_of_users").html(numOfUsers);
             $("#avg_taps").html(averageTaps);
+            $("#points").html(points);
         });
 
         var taps = 0;
@@ -27,9 +28,11 @@
         var interval = setInterval(sendTaps, ms);
 
         function sendTaps() {
-            socket.emit('tap', 1000, taps);
-            $('#log').prepend("<li>Sent " + taps + " taps</li>");
-            taps = 0;
+            if (taps > 0) {
+                socket.emit('tap', 1000, taps);
+                $('#log').prepend("<li>Sent " + taps + " taps</li>");
+                taps = 0;
+            }
         }
 
         $(document).ready(function() {
@@ -51,6 +54,7 @@
     <div class="stats">BPM: <span id="bpm">0</span></div>
     <div class="stats">Num. of users: <span id="num_of_users">0</span></div>
     <div class="stats">Avg. taps: <span id="avg_taps">0</span></div>
+    <div class="stats">Points: <span id="points">0</span></div>
 
     <ul id="log">
     </ul>

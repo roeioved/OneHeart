@@ -49,20 +49,24 @@ exports.apiAdd = function(req, res) {
 }
 
 exports.updateNumOfUsers = function(id, numOfUsers, callback) {
-    var now = new Date().getTime();
-
     _db.collection(HEARTS_COLLECTION, function(err, collection) {
-        collection.update({'_id':id}, {$set:{'num_of_users':numOfUsers, 'timestamp':now}}, {upsert:true, safe:true}, function(err, result) {
+        collection.update({'_id':id}, {$set:{'num_of_users':numOfUsers}}, {upsert:true, safe:true}, function(err, result) {
             callback(err);
         });
     });
 }
 
 exports.updateAverageTaps = function(id, averageTaps, callback) {
-    var now = new Date().getTime();
-
     _db.collection(HEARTS_COLLECTION, function(err, collection) {
-        collection.update({'_id':id}, {$set:{'average_taps':averageTaps, 'timestamp':now}}, {upsert:true, safe:true}, function(err, result) {
+        collection.update({'_id':id}, {$set:{'average_taps':averageTaps}}, {upsert:true, safe:true}, function(err, result) {
+            callback(err);
+        });
+    });
+}
+
+exports.updatePoints = function(id, diff, callback) {
+    _db.collection(HEARTS_COLLECTION, function(err, collection) {
+        collection.update({'_id':id}, {$inc:{'points':diff}}, {upsert:true, safe:true}, function(err, result) {
             callback(err);
         });
     });
@@ -71,8 +75,6 @@ exports.updateAverageTaps = function(id, averageTaps, callback) {
 exports.apiUpdate = function(req, res) {
     var id = req.params.id;
     var heart = req.body;
-
-    heart.timestamp = new Date().getTime();
 
     _db.collection(HEARTS_COLLECTION, function(err, collection) {
         collection.update({'_id':id}, heart, {upsert:true, safe:true}, function(err, result) {
