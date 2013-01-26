@@ -1,4 +1,4 @@
-var CALCULATION_INTERVAL = 3;
+var CALCULATION_INTERVAL = 1;
 var db = require('./connectdb').db;
 var tap = require('./taps').setDb(db);
 var heart = require('./heart').setDb(db);
@@ -35,8 +35,8 @@ function calculateAverageForTaps(heartInfo,heartTaps, numberOfUsers)
     // Go over all the hearts
     heartTaps.forEach(function(currHeartTap)
     {
-        sumOfTaps += currHeartTap.taps}
-    )
+        sumOfTaps += currHeartTap.taps / ((currHeartTap.to - currHeartTap.from) / 1000);
+    });
 
     // Calculate the average
     var average = sumOfTaps / numberOfUsers;
