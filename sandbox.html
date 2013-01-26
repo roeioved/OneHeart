@@ -15,8 +15,10 @@
             socket.emit('join', heart);
         });
 
-        socket.on('stats', function(numOfUsers) {
+        socket.on('stats', function(bpm, numOfUsers, averageTaps) {
+            $("#bpm").html(bpm);
             $("#num_of_users").html(numOfUsers);
+            $("#avg_taps").html(averageTaps);
         });
 
         var taps = 0;
@@ -45,9 +47,11 @@
 
 <body>
     <div id="tap">tap!</div>
-    <div class="stats">
-        Num. of users: <span id="num_of_users">0</span>
-    </div>
+
+    <div class="stats">BPM: <span id="bpm">0</span></div>
+    <div class="stats">Num. of users: <span id="num_of_users">0</span></div>
+    <div class="stats">Avg. taps: <span id="avg_taps">0</span></div>
+
     <ul id="log">
     </ul>
 </body>

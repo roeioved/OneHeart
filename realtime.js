@@ -8,9 +8,13 @@ io.sockets.on('connection', function(socket) {
         console.log('user connected to heart ' + heart);
         socket.set('heart', heart, function(){});
         socket.join(heart);
+
+        var bpm = Math.floor((Math.random()*80)+60);
         var numOfUsers = io.sockets.clients(heart).length;
-        socket.to(heart).emit('stats', numOfUsers);
-        socket.broadcast.to(heart).emit('stats', numOfUsers);
+        var averageTaps = Math.floor((Math.random()*8)+0);
+
+        socket.to(heart).emit('stats', bpm, numOfUsers, averageTaps);
+        socket.broadcast.to(heart).emit('stats', bpm, numOfUsers, averageTaps);
 
         // get hearts collection
         var collection = db.collection('hearts');
@@ -26,8 +30,12 @@ io.sockets.on('connection', function(socket) {
     socket.on('disconnect', function() {
         socket.get('heart', function(err, heart) {
             console.log('user disconnected from heart ' + heart + '!');
-            var numOfUsers = io.sockets.clients(heart).length - 1;
-            socket.broadcast.to(heart).emit('stats', numOfUsers);
+
+            var bpm = Math.floor((Math.random()*80)+60);
+            var numOfUsers = io.sockets.clients(heart).length;
+            var averageTaps = Math.floor((Math.random()*8)+0);
+
+            socket.broadcast.to(heart).emit('stats', bpm, numOfUsers, averageTaps);
 
             // get hearts collection
             var collection = db.collection('hearts');
@@ -48,3 +56,13 @@ io.sockets.on('connection', function(socket) {
         });
     });
 });
+
+setInterval(function() {
+    var heart = 'sandbox';
+
+    var bpm = Math.floor((Math.random()*80)+60);
+    var numOfUsers = io.sockets.clients(heart).length;
+    var averageTaps = Math.floor((Math.random()*8)+0);
+
+    io.sockets.in(heart).emit('stats', bpm, numOfUsers, averageTaps);
+}, 1000);
