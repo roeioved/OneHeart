@@ -52,7 +52,7 @@ exports.updateNumOfUsers = function(id, numOfUsers, callback) {
     var now = new Date().getTime();
 
     _db.collection(HEARTS_COLLECTION, function(err, collection) {
-        collection.update({'_id':id}, {$set:{'num_of_users':numOfUsers,'timestamp':now}}, {safe:true}, function(err, result) {
+        collection.update({'_id':id}, {$set:{'num_of_users':numOfUsers, 'timestamp':now}}, {upsert:true, safe:true}, function(err, result) {
             callback(err);
         });
     });
@@ -62,7 +62,7 @@ exports.updateAverageTaps = function(id, averageTaps, callback) {
     var now = new Date().getTime();
 
     _db.collection(HEARTS_COLLECTION, function(err, collection) {
-        collection.update({'_id':id}, {$set:{'average_taps':averageTaps,'timestamp':now}}, {safe:true}, function(err, result) {
+        collection.update({'_id':id}, {$set:{'average_taps':averageTaps, 'timestamp':now}}, {upsert:true, safe:true}, function(err, result) {
             callback(err);
         });
     });
@@ -75,7 +75,7 @@ exports.apiUpdate = function(req, res) {
     heart.timestamp = new Date().getTime();
 
     _db.collection(HEARTS_COLLECTION, function(err, collection) {
-        collection.update({'_id':id}, heart, {safe:true}, function(err, result) {
+        collection.update({'_id':id}, heart, {upsert:true, safe:true}, function(err, result) {
             if (err) {
                 res.send({'error':'An error has occurred'});
             } else {
