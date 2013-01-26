@@ -6,28 +6,28 @@ exports.setDb = function(db) {
     return exports;
 }
 
-exports.findByHeart = function(heart) {
+exports.findByHeart = function(heart, callback) {
     _db.collection(TAPS_COLLECTION, function(err, collection) {
         collection.find({'heart':heart}).toArray(function(err, items) {
-            return items;
+            callback(items);
         });
     });
 };
 
 // returns all specific heart taps that thier to timestamp is within the last ms
-exports.findByHeartAndTime = function(heart, ms) {
+exports.findByHeartAndTime = function(heart, ms, callback) {
     var min = new Date().getTime() - ms;
     _db.collection(TAPS_COLLECTION, function(err, collection) {
         collection.find({$and:[{'heart':heart},{'to':{$gte:min}}]}).toArray(function(err, items) {
-            return items;
+            callback(items);
         });
     });
 };
 
-exports.findAll = function() {
+exports.findAll = function(callback) {
     _db.collection(TAPS_COLLECTION, function(err, collection) {
         collection.find().toArray(function(err, items) {
-            return items;
+            callback(items);
         });
     });
 };
