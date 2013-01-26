@@ -69,17 +69,17 @@ function calcBPM(points) {
     if (points == 0) {
         return 0;
     } else if (points > 10000) {
-        return Math.floor((Math.random()*95)+85);
+        return Math.floor((Math.random()*90)+85);
     } else {
-        return Math.floor((Math.random()*60)+20);
+        return Math.floor((Math.random()*60)+40);
     }
 }
 
 function getHeartStats(heart, callback) {
     heartManager.findById(heart, function(item) {
-        var numOfUsers = item.num_of_users ? item.num_of_users : 0;
-        var averageTaps = item.average_taps ? item.average_taps : 0;
-        var points = item.points ? item.points : 0;
+        var numOfUsers = (item.num_of_users == undefined || !item.num_of_users) ? 0 : item.num_of_users;
+        var averageTaps = (item.average_taps == undefined || !item.average_taps) ? 0 : item.average_taps;
+        var points = (item.points == undefined || !item.points) ? 0 : item.points;
         var bpm = calcBPM(points);
 
         var stats = {bpm:bpm, numOfUsers:numOfUsers, averageTaps:averageTaps, points:points};

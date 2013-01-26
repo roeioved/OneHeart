@@ -25,10 +25,9 @@ function calculateHeartBeatAverageForInterval(heartToCalculate, intervalSeconds)
     });
 };
 
-function calculateAverageForTaps(heartInfo, heartTaps, numberOfUsers)
-{
+function calculateAverageForTaps(heartInfo, heartTaps, numberOfUsers) {
     var sumOfTaps = 0;
-    var points = heartInfo.points;
+    var points = (heartInfo.points == undefined || !heartInfo.points) ? 0 : heartInfo.points;
 
     // Go over all the hearts
     heartTaps.forEach(function(currHeartTap) {
@@ -62,7 +61,7 @@ function calculateAverageForTaps(heartInfo, heartTaps, numberOfUsers)
     points -= (heartTaps.length == 0 ? 10 : heartTaps.length * 35);
 
     if (points < 0) points = 0;
-    
+
     heart.updateAverageTapsAndPoints(heartInfo._id, average, points, function() {
         console.log("DB updated")
     });
