@@ -1,10 +1,12 @@
+<!DOCTYPE HTML>
 <html>
 
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>One Heart</title>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
     <script type="text/javascript" src="socket.io.js"></script>
-    
+
     <script>
         var socket = io.connect('http://localhost:8000');
         var heart = 'sandbox';
@@ -12,22 +14,42 @@
         socket.on('connect', function() {
             socket.emit('join', heart);
         });
-                        
+
         socket.on('stats', function(numOfUsers) {
             $("#num_of_users").html(numOfUsers);
         });
 
+        var taps = 0;
+        var ms = 1000;
+
+        var interval = setInterval(sendTaps, ms);
+
+        function sendTaps() {
+            socket.emit('tap', 1000, taps);
+            $('#log').prepend("<li>Send " + taps + " taps</li>");
+            taps = 0;
+        }
+
         $(document).ready(function() {
             $("#tap").click(function() {
-                socket.emit('tap', 1000, 3);
+                taps++;
             });
         });
     </script>
+
+    <style>
+        #tap { background: red; padding: 20px; color: white; font-size: 24px; }
+        #log { }
+    </style>
 </head>
 
 <body>
     <div id="tap">tap!</div>
-    <div id="num_of_users"></div>
+    <div class="stats">
+        Num. of users: <span id="num_of_users">0</span>
+    </div>
+    <ul id="log">
+    </ul>
 </body>
 
 </html>

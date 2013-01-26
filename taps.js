@@ -19,7 +19,6 @@ exports.findByHeartAndTime = function(heart, ms) {
     var min = new Date().getTime() - ms;
     _db.collection(TAPS_COLLECTION, function(err, collection) {
         collection.find({$and:[{'heart':heart},{'to':{$gte:min}}]}).toArray(function(err, items) {
-            //console.log('Found ' + items.length + ' taps within time range');
             return items;
         });
     });
