@@ -23,7 +23,7 @@ function calculateHeartBeatAverageForInterval(heartToCalculate, intervalSeconds)
         }
         else
         {
-            console.Log("No heart users on heart:" + heartToCalculate);
+            console.log("No heart users on heart:" + heartToCalculate);
         }
     });
 };
@@ -46,7 +46,6 @@ function calculateAverageForTaps(heartInfo,heartTaps, numberOfUsers)
         // Insert the average into the heart Data
         heart.updateAverageTaps(heartInfo._id,average,function(){console.log("Updated DB")});
     }
-
 }
 
 function startWorkerForHeart(heartToWork)
