@@ -1,7 +1,10 @@
 var db = require('./connectdb').db;
-var tap = require('./taps').setDb(db);
+var heartManager = require('./heart').setDb(db);
+var tapManager = require('./taps').setDb(db);
 
 var io = require('socket.io').listen(8000);
+
+var intervals = [];
 
 io.sockets.on('connection', function(socket) {
     socket.on('join', function(heart) {
@@ -9,60 +12,66 @@ io.sockets.on('connection', function(socket) {
         socket.set('heart', heart, function(){});
         socket.join(heart);
 
-        var bpm = Math.floor((Math.random()*80)+60);
+        // get num. of users
         var numOfUsers = io.sockets.clients(heart).length;
-        var averageTaps = Math.floor((Math.random()*8)+0);
 
-        socket.to(heart).emit('stats', bpm, numOfUsers, averageTaps);
-        socket.broadcast.to(heart).emit('stats', bpm, numOfUsers, averageTaps);
-
-        // get hearts collection
-        var collection = db.collection('hearts');
-
-        var now = new Date().getTime();
-
-        // update heart stats
-        collection.update({_id:heart}, {$set:{num_of_users:numOfUsers,timestamp:now}}, {upsert:true,w:1}, function(err, result) {
+        // update num. of users on db
+        heartManager.updateNumOfUsers(heart, numOfUsers, function(err) {
             if(err) { return console.dir(err); }
         });
+
+        // get stats and send to user
+        getHeartStats(heart, function(stats) {
+            socket.to(heart).emit('stats', stats.bpm, stats.numOfUsers, stats.averageTaps);
+        });
+
+        // check if heart doesn't already have stats broadcast interval
+        if (!intervals[heart]) {
+            // create stats broadcast interval
+            intervals[heart] = setInterval(function() {
+                broadcastStats(heart);
+            }, 1000);
+        }
     });
 
     socket.on('disconnect', function() {
         socket.get('heart', function(err, heart) {
             console.log('user disconnected from heart ' + heart + '!');
 
-            var bpm = Math.floor((Math.random()*80)+60);
-            var numOfUsers = io.sockets.clients(heart).length;
-            var averageTaps = Math.floor((Math.random()*8)+0);
+            // get num. of users
+            var numOfUsers = io.sockets.clients(heart).length - 1;
 
-            socket.broadcast.to(heart).emit('stats', bpm, numOfUsers, averageTaps);
-
-            // get hearts collection
-            var collection = db.collection('hearts');
-
-            var now = new Date().getTime();
-
-            // update heart stats
-            collection.update({_id:heart}, {$set:{num_of_users:numOfUsers,timestamp:now}}, {upsert:true,w:1}, function(err, result) {
+            // update num. of users on db
+            heartManager.updateNumOfUsers(heart, numOfUsers, function(err) {
                 if(err) { return console.dir(err); }
             });
+
+            // check if last user
+            if (numOfUsers == 0) {
+                // clear stats broadcast interval
+                clearInterval(intervals[heart]);
+                delete intervals[heart];
+            }
         });
     });
 
     socket.on('tap', function(ms, taps) {
         socket.get('heart', function(err, heart) {
             console.log('user tapped on ' + heart + ' ' + taps + ' times in the last ' + ms + 'ms');
-            tap.add(heart, ms, taps);
+            tapManager.add(heart, ms, taps);
         });
     });
 });
 
-setInterval(function() {
-    var heart = 'sandbox';
+function getHeartStats(heart, callback) {
+    heartManager.findById(heart, function(item) {
+        var stats = {bpm:0, numOfUsers:item.num_of_users, averageTaps:0};
+        callback(stats);
+    });
+}
 
-    var bpm = Math.floor((Math.random()*80)+60);
-    var numOfUsers = io.sockets.clients(heart).length;
-    var averageTaps = Math.floor((Math.random()*8)+0);
-
-    io.sockets.in(heart).emit('stats', bpm, numOfUsers, averageTaps);
-}, 1000);
+function broadcastStats(heart) {
+    getHeartStats(heart, function(stats) {
+        io.sockets.in(heart).emit('stats', stats.bpm, stats.numOfUsers, stats.averageTaps);
+    });
+}

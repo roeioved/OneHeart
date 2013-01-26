@@ -48,9 +48,38 @@ exports.apiAdd = function(req, res) {
     });
 }
 
+exports.updateNumOfUsers = function(id, numOfUsers, callback) {
+    var heart = {};
+    heart._id = id;
+    heart.num_of_users = numOfUsers;
+    heart.timestamp = new Date().getTime();
+
+    _db.collection(HEARTS_COLLECTION, function(err, collection) {
+        collection.update({'_id':id}, heart, {safe:true}, function(err, result) {
+            callback(err);
+        });
+    });
+}
+
+exports.updateAverageTaps = function(id, averageTaps, callback) {
+    var heart = {};
+    heart._id = id;
+    heart.average_taps = averageTaps;
+    heart.timestamp = new Date().getTime();
+
+    _db.collection(HEARTS_COLLECTION, function(err, collection) {
+        collection.update({'_id':id}, heart, {safe:true}, function(err, result) {
+            callback(err);
+        });
+    });
+}
+
 exports.apiUpdate = function(req, res) {
     var id = req.params.id;
     var heart = req.body;
+
+    heart.timestamp = new Date().getTime();
+
     _db.collection(HEARTS_COLLECTION, function(err, collection) {
         collection.update({'_id':id}, heart, {safe:true}, function(err, result) {
             if (err) {
