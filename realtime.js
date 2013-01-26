@@ -57,7 +57,7 @@ io.sockets.on('connection', function(socket) {
 
     socket.on('tap', function(ms, taps) {
         socket.get('heart', function(err, heart) {
-            console.log('user tapped on ' + heart + ' ' + taps + ' times in the last ' + ms + 'ms');
+            //console.log('user tapped on ' + heart + ' ' + taps + ' times in the last ' + ms + 'ms');
             tapManager.add(heart, ms, taps);
         });
     });
