@@ -9,10 +9,10 @@ app.configure(function () {
     app.use(express.bodyParser());
 });
 
-app.get('/hearts', heart.findAll);
-app.get('/hearts/:id', heart.findById);
-app.post('/hearts', heart.add);
-app.put('/hearts/:id', heart.update);
-app.delete('/hearts/:id', heart.delete);
+app.get('/hearts', heart.apiFindAll);
+app.get('/hearts/:id', heart.apiFindById);
+app.post('/hearts', heart.apiAdd);
+app.put('/hearts/:id', heart.apiUpdate);
+app.delete('/hearts/:id', heart.apiDelete);
 
 app.listen(8001);

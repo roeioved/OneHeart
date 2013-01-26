@@ -6,24 +6,36 @@ exports.setDb = function(db) {
     return exports;
 }
 
-exports.findById = function(req, res) {
-    var id = req.params.id;
+exports.findById = function(id, callback) {
     _db.collection(HEARTS_COLLECTION, function(err, collection) {
         collection.findOne({'_id':id}, function(err, item) {
-            res.send(item);
+            callback(item);
         });
     });
 };
 
-exports.findAll = function(req, res) {
+exports.apiFindById = function(req, res) {
+    var id = req.params.id;
+    exports.findById(id, function(item) {
+        res.send(item);
+    });
+};
+
+exports.findAll = function(callback) {
     _db.collection(HEARTS_COLLECTION, function(err, collection) {
         collection.find().toArray(function(err, items) {
-            res.send(items);
+            callback(items);
         });
     });
 };
 
-exports.add = function(req, res) {
+exports.apiFindAll = function(req, res) {
+    exports.findAll(function(items) {
+        res.send(items);
+    });
+};
+
+exports.apiAdd = function(req, res) {
     var heart = req.body;
     _db.collection(HEARTS_COLLECTION, function(err, collection) {
         collection.insert(heart, {safe:true}, function(err, result) {
@@ -36,7 +48,7 @@ exports.add = function(req, res) {
     });
 }
 
-exports.update = function(req, res) {
+exports.apiUpdate = function(req, res) {
     var id = req.params.id;
     var heart = req.body;
     _db.collection(HEARTS_COLLECTION, function(err, collection) {
@@ -50,7 +62,7 @@ exports.update = function(req, res) {
     });
 }
 
-exports.delete = function(req, res) {
+exports.apiDelete = function(req, res) {
     var id = req.params.id;
     _db.collection(HEARTS_COLLECTION, function(err, collection) {
         collection.remove({'_id':id}, {safe:true}, function(err, result) {
