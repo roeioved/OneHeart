@@ -65,7 +65,7 @@ io.sockets.on('connection', function(socket) {
 
 function getHeartStats(heart, callback) {
     heartManager.findById(heart, function(item) {
-        var stats = {bpm:0, numOfUsers:item.num_of_users, averageTaps:0};
+        var stats = {bpm:0, numOfUsers:item.num_of_users, averageTaps:item.average_taps};
         callback(stats);
     });
 }

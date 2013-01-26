@@ -18,7 +18,8 @@ exports.findByHeart = function(heart, callback) {
 exports.findByHeartAndTime = function(heart, ms, callback) {
     var min = new Date().getTime() - ms;
     _db.collection(TAPS_COLLECTION, function(err, collection) {
-        collection.find({$and:[{'heart':heart},{'to':{$gte:min}}]}).toArray(function(err, items) {
+        collection.find({$and:[{'heart':heart},{'to':{$gte:min}}]}).toArray(function(err, items)
+        {
             callback(items);
         });
     });
