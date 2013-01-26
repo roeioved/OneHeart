@@ -1,5 +1,6 @@
+var db = require('./connectdb').db;
+
 var io = require('socket.io').listen(8000);
-var MongoClient = require('mongodb').MongoClient;
 
 io.sockets.on('connection', function(socket) {
     socket.on('join', function(heart) {
@@ -10,19 +11,14 @@ io.sockets.on('connection', function(socket) {
         socket.to(heart).emit('stats', numOfUsers);
         socket.broadcast.to(heart).emit('stats', numOfUsers);
 
-        // connect to the db
-        MongoClient.connect("mongodb://localhost:27017/oneheart", function(err, db) {
-            if(err) { return console.dir("Could not connect to db! " + err); }
+        // get hearts collection
+        var collection = db.collection('hearts');
 
-            // get hearts collection
-            var collection = db.collection('hearts');
+        var now = new Date().getTime();
 
-            var now = new Date().getTime();
-
-            // update heart stats
-            collection.update({_id:heart}, {$set:{num_of_users:numOfUsers,timestamp:now}}, {upsert:true,w:1}, function(err, result) {
-                if(err) { return console.dir(err); }
-            });
+        // update heart stats
+        collection.update({_id:heart}, {$set:{num_of_users:numOfUsers,timestamp:now}}, {upsert:true,w:1}, function(err, result) {
+            if(err) { return console.dir(err); }
         });
     });
 
@@ -32,19 +28,14 @@ io.sockets.on('connection', function(socket) {
             var numOfUsers = io.sockets.clients(heart).length - 1;
             socket.broadcast.to(heart).emit('stats', numOfUsers);
 
-            // connect to the db
-            MongoClient.connect("mongodb://localhost:27017/oneheart", function(err, db) {
-                if(err) { return console.dir("Could not connect to db! " + err); }
+            // get hearts collection
+            var collection = db.collection('hearts');
 
-                // get hearts collection
-                var collection = db.collection('hearts');
+            var now = new Date().getTime();
 
-                var now = new Date().getTime();
-
-                // update heart stats
-                collection.update({_id:heart}, {$set:{num_of_users:numOfUsers,timestamp:now}}, {upsert:true,w:1}, function(err, result) {
-                    if(err) { return console.dir(err); }
-                });
+            // update heart stats
+            collection.update({_id:heart}, {$set:{num_of_users:numOfUsers,timestamp:now}}, {upsert:true,w:1}, function(err, result) {
+                if(err) { return console.dir(err); }
             });
         });
     });
